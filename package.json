@@ -1,0 +1,11 @@
+{
+  "name": "riot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "riot components/ components.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
