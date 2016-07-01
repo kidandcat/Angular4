@@ -1,23 +1,33 @@
 riot.tag2('app-bar', '<div class="mui-appbar"> <yield></yield> </div>', '', '', function(opts) {
 });
 
-riot.tag2('form-field', '<div class="mui-textfield mui-textfield--float-label"> <input type="{type}" id="{id}" placeholder="{placeholder}"> <label for="{id}">{label}:</label> </div>', 'form-field label,[riot-tag="form-field"] label,[data-is="form-field"] label{ margin-right: 15px; }', '', function(opts) {
+riot.tag2('form-field', '<div class="mui-textfield mui-textfield--float-label"> <input type="{type}" id="{id}" placeholder="{placeholder}"> <label for="{id}">{label}:</label> </div>', '', '', function(opts) {
         this.type = opts.type;
         this.label = opts.label;
-        this.id = opts.id || this.label;
+        this.id = opts.pid || this.label;
         this.placeholder = opts.placeholder;
 });
 
-riot.tag2('form-select', '<div> <label for="{id}">{label}:</label> <div class="mui-textfield"> <input type="{type}" id="{id}" placeholder="{placeholder}"> </div> </div>', 'form-select label,[riot-tag="form-select"] label,[data-is="form-select"] label{ margin-right: 15px; }', '', function(opts) {
-        this.type = opts.type;
+riot.tag2('form-select', '<div class="mui-select"> <select id="{id}"> <option if="{type == \'flavor\'}" each="{options}" value="{ID}"> {Name} - {VCPUs} CPUs, {RAM}MB ram, {Disk}GB Disk </option> <option if="{type == \'image\'}" each="{options}" value="{ID}"> {Name} </option> </select> <label for="{id}">{label}:</label> </div>', '', '', function(opts) {
+        var self = this;
         this.label = opts.label;
-        this.id = opts.id || this.label;
-        this.placeholder = opts.placeholder;
+        this.id = opts.pid || this.label;
+        this.options = '';
+        this.type = opts.type;
+        var url = '';
+        if(opts.type == 'flavor'){
+          url = 'http://192.168.0.30:7000/list/flavor';
+        }else if(opts.type == 'image'){
+          url = 'http://192.168.0.30:7000/list/image';
+        }
 
-        this.options
+        get(url, function(res){
+          self.options = JSON.parse(res);
+          self.update();
+        });
 });
 
-riot.tag2('main-form', '<div class="mui-container"> <div class="mui-panel"> <form-field type="text" id="name" label="Nombre de la maquina"></form-field> <form-field id="email" label="Email" type="email"></form-field> <form-field type="text" id="flavors" label="Flavor"></form-field> <form-field type="select" id="flavors" label="Flavor"></form-field> <button type="submit" class="mui--z2 mui-btn mui-btn--primary">Crear Maquina Virtual</button> </div> </div>', '', '', function(opts) {
+riot.tag2('main-form', '<div class="mui-container"> <div class="mui-panel"> <form-field type="text" pid="name" label="Nombre de la maquina"></form-field> <form-field pid="email" label="Email" type="email"></form-field> <form-select type="flavor" pid="flavor" label="Flavor"></form-select> <form-select type="image" pid="image" label="Image"></form-select> <button class="mui--z2 mui-btn mui-btn--primary" id="submit">Crear Maquina Virtual</button> </div> </div>', '', '', function(opts) {
 });
 
 riot.tag2('modal-loading', '', '', '', function(opts) {
@@ -33,5 +43,8 @@ riot.tag2('modal-loading', '', '', '', function(opts) {
             loader.appendChild(img);
 
             mui.overlay('on', loader);
+        }
+        window.deactivateModal = function() {
+          mui.overlay('off');
         }
 });

@@ -14,6 +14,9 @@
             // show modal
             mui.overlay('on', loader);
         }
+        window.deactivateModal = function() {
+          mui.overlay('off');
+        }
     </script>
 
 </modal-loading>
